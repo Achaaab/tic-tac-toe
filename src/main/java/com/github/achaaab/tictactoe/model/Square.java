@@ -15,15 +15,28 @@ import static com.github.achaaab.tictactoe.model.TicTacToe.EMPTY;
  */
 public class Square {
 
+	private final int index;
 	private char symbol;
 
 	/**
 	 * Creates an initially empty square.
 	 *
+	 * @param index square index, between 0 and 8 included
 	 * @since 0.0.0
 	 */
-	public Square() {
+	public Square(int index) {
+
+		this.index = index;
+
 		symbol = EMPTY;
+	}
+
+	/**
+	 * @return square index, between 0 and 8 included
+	 * @since 0.0.0
+	 */
+	public int getIndex() {
+		return index;
 	}
 
 	/**

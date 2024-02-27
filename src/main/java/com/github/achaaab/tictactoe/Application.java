@@ -1,8 +1,9 @@
 package com.github.achaaab.tictactoe;
 
 import com.github.achaaab.tictactoe.controller.TicTacToeController;
+import com.github.achaaab.tictactoe.decision.NegaMax;
 import com.github.achaaab.tictactoe.model.TicTacToe;
-import com.github.achaaab.tictactoe.view.TicTacToeView;
+import com.github.achaaab.tictactoe.view.swing.TicTacToeViewSwing;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -30,13 +31,12 @@ public class Application {
 	 */
 	public static void main(String... arguments) {
 
-		var ticTacToe = new TicTacToe();
-		var controller = new TicTacToeController(ticTacToe);
-
 		invokeLater(() -> {
 
-			var view = new TicTacToeView(controller);
-			controller.setView(view);
+			var model = new TicTacToe();
+			var decisionAlgorithm = new NegaMax<>(model);
+			var view = new TicTacToeViewSwing();
+			var controller = new TicTacToeController(model, view, decisionAlgorithm);
 
 			controller.playAi();
 

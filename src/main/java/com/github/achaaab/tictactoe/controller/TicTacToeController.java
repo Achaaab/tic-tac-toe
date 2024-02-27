@@ -1,14 +1,14 @@
 package com.github.achaaab.tictactoe.controller;
 
 import com.github.achaaab.tictactoe.decision.DecisionAlgorithm;
-import com.github.achaaab.tictactoe.decision.NegaMax;
 import com.github.achaaab.tictactoe.model.DrawSymbol;
 import com.github.achaaab.tictactoe.model.Square;
 import com.github.achaaab.tictactoe.model.TicTacToe;
-import com.github.achaaab.tictactoe.view.SquareView;
 import com.github.achaaab.tictactoe.view.TicTacToeView;
 
 import java.util.List;
+
+import static java.util.stream.IntStream.range;
 
 /**
  * Tic-tac-toe game controller.
@@ -19,48 +19,47 @@ import java.util.List;
 public class TicTacToeController {
 
 	private final TicTacToe model;
+	private final TicTacToeView view;
 	private final List<SquareController> squares;
 	private final DecisionAlgorithm<DrawSymbol> decisionAlgorithm;
-
-	private TicTacToeView view;
 
 	/**
 	 * Creates a controller for the given Tic-tac-toe game.
 	 *
-	 * @param model Tic-tac-toe game
+	 * @param model Tic-tac-toe game model
+	 * @param view Tic-tac-toe game view
+	 * @param decisionAlgorithm AI decision algorithm
 	 * @since 0.0.0
 	 */
-	public TicTacToeController(TicTacToe model) {
+	public TicTacToeController(TicTacToe model, TicTacToeView view, DecisionAlgorithm<DrawSymbol> decisionAlgorithm) {
 
 		this.model = model;
+		this.view = view;
 
-		squares = model.getSquares().stream().
-				map(this::createSquare).
+		squares = range(0, 9).
+				mapToObj(this::createSquareController).
 				toList();
 
-		decisionAlgorithm = new NegaMax<>(model);
+		this.decisionAlgorithm = decisionAlgorithm;
 	}
 
 	/**
-	 * Sets the view for this Tic-tac-toe game.
+	 * Creates a controller for the specified square.
 	 *
-	 * @param view Tic-tac-toe view
+	 * @param index index of the square
+	 * @return created controller
 	 * @since 0.0.0
 	 */
-	public void setView(TicTacToeView view) {
-		this.view = view;
+	private SquareController createSquareController(int index) {
+
+		var squareModel = model.getSquare(index);
+		var squareView = view.getSquare(index);
+
+		return new SquareController(this, squareModel,squareView);
 	}
 
 	/**
-	 * @return square controllers
-	 * @since 0.0.0
-	 */
-	public List<SquareController> getSquares() {
-		return squares;
-	}
-
-	/**
-	 * Plays in the given square.
+	 * Plays in the given square then plays the AI move if the game is not ended.
 	 *
 	 * @param square square to play
 	 * @since 0.0.0
@@ -68,7 +67,7 @@ public class TicTacToeController {
 	public void play(Square square) {
 
 		model.play(square);
-		view.update();
+		updateSquareView(square);
 
 		if (model.isWin()) {
 
@@ -89,15 +88,15 @@ public class TicTacToeController {
 	}
 
 	/**
-	 * Plays best AI move.
+	 * Plays the AI move.
 	 *
 	 * @since 0.0.0
 	 */
 	public void playAi() {
 
-		var move = decisionAlgorithm.getBestMove();
-		model.play(move);
-		view.update();
+		var bestMove = decisionAlgorithm.getBestMove();
+		model.play(bestMove);
+		updateSquareView(bestMove.square());
 
 		if (model.isWin()) {
 
@@ -114,18 +113,15 @@ public class TicTacToeController {
 	}
 
 	/**
-	 * Creates a Tic-tac-toe square controller, with a view set.
+	 * Updates the view for the given square.
 	 *
-	 * @param squareModel square model
-	 * @return square controller
+	 * @param square square whose view must be updated
 	 * @since 0.0.0
 	 */
-	private SquareController createSquare(Square squareModel) {
+	private void updateSquareView(Square square) {
 
-		var square = new SquareController(this, squareModel);
-		var squareView = new SquareView(square);
-		square.setView(squareView);
-
-		return square;
+		var squareIndex = square.getIndex();
+		var squareController = squares.get(squareIndex);
+		squareController.updateView();
 	}
 }

@@ -1,4 +1,4 @@
-package com.github.achaaab.tictactoe.view;
+package com.github.achaaab.tictactoe.view.swing;
 
 import java.awt.Toolkit;
 
@@ -6,12 +6,12 @@ import static java.awt.Toolkit.getDefaultToolkit;
 import static java.lang.Math.round;
 
 /**
- * View utility functions.
+ * Swing utility functions.
  *
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
-public class ViewUtility {
+public class SwingUtility {
 
 	private static final Toolkit TOOLKIT = getDefaultToolkit();
 	private static final float BASE_RESOLUTION = 72.0f;

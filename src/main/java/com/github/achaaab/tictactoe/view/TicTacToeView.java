@@ -1,84 +1,47 @@
 package com.github.achaaab.tictactoe.view;
 
-import com.github.achaaab.tictactoe.controller.SquareController;
-import com.github.achaaab.tictactoe.controller.TicTacToeController;
-
-import javax.swing.JPanel;
-import java.awt.GridLayout;
-import java.util.List;
-
-import static javax.swing.JOptionPane.showMessageDialog;
-
 /**
- * Basic view for a Tic-tac-toe game.
+ * View for a Tic-tac-toe game.
  *
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
-public class TicTacToeView extends JPanel {
-
-	private final List<SquareView> squares;
-
-	/**
-	 * Creates a view for a Tic-tac-toe game.
-	 *
-	 * @param ticTacToe controller of the Tic-tac-toe game to display
-	 * @since 0.0.0
-	 */
-	public TicTacToeView(TicTacToeController ticTacToe) {
-
-		setLayout(new GridLayout(3, 3));
-
-		squares = ticTacToe.getSquares().stream().
-				map(SquareController::getView).
-				toList();
-
-		squares.forEach(this::add);
-	}
+public interface TicTacToeView {
 
 	/**
 	 * Updates this view.
 	 *
 	 * @since 0.0.0
 	 */
-	public void update() {
-		squares.forEach(SquareView::update);
-	}
+	void update();
 
 	/**
 	 * Displays a win message and waits for the user to confirm it.
 	 *
 	 * @since 0.0.0
 	 */
-	public void showWin() {
-		showMessage("You won!");
-	}
+	void showWin();
 
 	/**
 	 * Displays a loss message and waits for the user to confirm it.
 	 *
 	 * @since 0.0.0
 	 */
-	public void showLoss() {
-		showMessage("You lost...");
-	}
+	void showLoss();
 
 	/**
 	 * Displays a draw message and waits for the user to confirm it.
 	 *
 	 * @since 0.0.0
 	 */
-	public void showDraw() {
-		showMessage("It's a draw.");
-	}
+	void showDraw();
 
 	/**
-	 * Displays a message and waits for the user to confirm it.
+	 * Gets the view for the square at specified index.
 	 *
-	 * @param message message to display
+	 * @param index square index
+	 * @return view for the square et specified index
 	 * @since 0.0.0
 	 */
-	private void showMessage(String message) {
-		showMessageDialog(null, message);
-	}
+	SquareView getSquare(int index);
 }

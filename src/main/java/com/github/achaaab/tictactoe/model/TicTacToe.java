@@ -45,7 +45,7 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 	public TicTacToe() {
 
 		squares = range(0, 9).
-				mapToObj(index -> new Square()).
+				mapToObj(Square::new).
 				toList();
 
 		currentSymbol = CROSS;
@@ -61,11 +61,14 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 	}
 
 	/**
-	 * @return squares
+	 * Gets the square at specified index.
+	 *
+	 * @param index square index
+	 * @return square at specified index
 	 * @since 0.0.0
 	 */
-	public List<Square> getSquares() {
-		return squares;
+	public Square getSquare(int index) {
+		return squares.get(index);
 	}
 
 	@Override
@@ -118,9 +121,7 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 	 * @since 0.0.0
 	 */
 	public void play(Square square) {
-
-		var move = new DrawSymbol(square, currentSymbol);
-		play(move);
+		play(new DrawSymbol(square, currentSymbol));
 	}
 
 	@Override
