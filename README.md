@@ -31,7 +31,12 @@ java -jar target/tic-tac-toe-0.0.0.jar
 ```
 
 ### Screenshots
-<img src=".github/pictures/screenshot.png" width="256"  alt="main menu screenshot"/>
+
+#### Swing
+<img src=".github/pictures/screenshot_swing.png" width="256"  alt="Swing view screenshot"/>
+
+#### Terminal
+<img src=".github/pictures/screenshot_terminal.png" width="256"  alt="terminal view screenshot"/>
 
 ## Authors
 * **Jonathan Guéhenneux** - *Programmer* - [Achaaab](https://github.com/Achaaab)

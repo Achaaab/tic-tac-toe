@@ -11,11 +11,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import static com.github.achaaab.tictactoe.model.TicTacToe.CIRCLE;
+import static com.github.achaaab.tictactoe.view.TicTacToeView.CIRCLE_COLOR;
+import static com.github.achaaab.tictactoe.view.TicTacToeView.CROSS_COLOR;
 import static com.github.achaaab.tictactoe.view.swing.SwingUtility.scale;
 import static com.github.achaaab.tictactoe.view.swing.SwingUtility.scaleFloat;
 import static java.awt.BorderLayout.CENTER;
-import static java.awt.Color.BLUE;
-import static java.awt.Color.RED;
 import static java.util.Arrays.stream;
 
 /**
@@ -25,7 +25,7 @@ import static java.util.Arrays.stream;
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
-public class SquareViewSwing extends JPanel implements SquareView {
+public class SquareSwing extends JPanel implements SquareView {
 
 	private final JButton button;
 	private final JLabel label;
@@ -37,7 +37,7 @@ public class SquareViewSwing extends JPanel implements SquareView {
 	 *
 	 * @since 0.0.0
 	 */
-	public SquareViewSwing() {
+	public SquareSwing() {
 
 		button = new JButton();
 		label = new JLabel();
@@ -46,6 +46,7 @@ public class SquareViewSwing extends JPanel implements SquareView {
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setVerticalAlignment(SwingConstants.CENTER);
 		button.addActionListener(event -> controller.play());
+		button.setEnabled(false);
 
 		setPreferredSize(new Dimension(scale(64), scale(64)));
 		setLayout(new BorderLayout());
@@ -59,9 +60,14 @@ public class SquareViewSwing extends JPanel implements SquareView {
 		stream(button.getActionListeners()).
 				forEach(button::removeActionListener);
 
-		button.addActionListener(event -> controller.play());
+		button.addActionListener(event -> play());
 
 		update();
+	}
+
+	@Override
+	public SquareController getController() {
+		return controller;
 	}
 
 	@Override
@@ -77,12 +83,21 @@ public class SquareViewSwing extends JPanel implements SquareView {
 
 			var symbol = controller.getSymbol();
 			label.setText(Character.toString(symbol));
-			label.setForeground(symbol == CIRCLE ? RED : BLUE);
+			label.setForeground(symbol == CIRCLE ? CIRCLE_COLOR : CROSS_COLOR);
 
 			add(label, CENTER);
 		}
 
 		validate();
 		repaint();
+	}
+
+	/**
+	 * Enables the player to move in this square.
+	 *
+	 * @since 0.0.0
+	 */
+	public void enableMove() {
+		button.setEnabled(true);
 	}
 }

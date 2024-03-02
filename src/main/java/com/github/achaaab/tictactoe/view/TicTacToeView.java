@@ -1,5 +1,10 @@
 package com.github.achaaab.tictactoe.view;
 
+import java.awt.Color;
+
+import static java.awt.Color.BLUE;
+import static java.awt.Color.RED;
+
 /**
  * View for a Tic-tac-toe game.
  *
@@ -7,6 +12,9 @@ package com.github.achaaab.tictactoe.view;
  * @since 0.0.0
  */
 public interface TicTacToeView {
+
+	Color CIRCLE_COLOR = RED;
+	Color CROSS_COLOR = BLUE;
 
 	/**
 	 * Updates this view.
@@ -44,4 +52,11 @@ public interface TicTacToeView {
 	 * @since 0.0.0
 	 */
 	SquareView getSquare(int index);
+
+	/**
+	 * Waits for the user to make his move.
+	 *
+	 * @since 0.0.0
+	 */
+	void waitUserMove();
 }

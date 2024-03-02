@@ -45,7 +45,7 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 	public TicTacToe() {
 
 		squares = range(0, 9).
-				mapToObj(Square::new).
+				mapToObj(index -> new Square()).
 				toList();
 
 		currentSymbol = CROSS;

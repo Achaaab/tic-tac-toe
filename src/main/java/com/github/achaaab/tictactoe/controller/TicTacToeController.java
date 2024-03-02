@@ -6,8 +6,6 @@ import com.github.achaaab.tictactoe.model.Square;
 import com.github.achaaab.tictactoe.model.TicTacToe;
 import com.github.achaaab.tictactoe.view.TicTacToeView;
 
-import java.util.List;
-
 import static java.util.stream.IntStream.range;
 
 /**
@@ -20,7 +18,6 @@ public class TicTacToeController {
 
 	private final TicTacToe model;
 	private final TicTacToeView view;
-	private final List<SquareController> squares;
 	private final DecisionAlgorithm<DrawSymbol> decisionAlgorithm;
 
 	/**
@@ -36,9 +33,7 @@ public class TicTacToeController {
 		this.model = model;
 		this.view = view;
 
-		squares = range(0, 9).
-				mapToObj(this::createSquareController).
-				toList();
+		range(0, 9).forEach(this::createSquareController);
 
 		this.decisionAlgorithm = decisionAlgorithm;
 	}
@@ -47,15 +42,23 @@ public class TicTacToeController {
 	 * Creates a controller for the specified square.
 	 *
 	 * @param index index of the square
-	 * @return created controller
 	 * @since 0.0.0
 	 */
-	private SquareController createSquareController(int index) {
+	private void createSquareController(int index) {
 
 		var squareModel = model.getSquare(index);
 		var squareView = view.getSquare(index);
 
-		return new SquareController(this, squareModel,squareView);
+		new SquareController(this, squareModel,squareView);
+	}
+
+	/**
+	 * Waits for the user to make his move.
+	 *
+	 * @since 0.0.0
+	 */
+	public void waitUserMove() {
+		view.waitUserMove();
 	}
 
 	/**
@@ -67,19 +70,23 @@ public class TicTacToeController {
 	public void play(Square square) {
 
 		model.play(square);
-		updateSquareView(square);
 
-		if (model.isWin()) {
+		var win = model.isWin();
+		var draw = model.isDraw();
 
-			view.showWin();
-			model.reset();
+		if (win || draw) {
+
 			view.update();
 
-		} else if (model.isDraw()) {
+			if (win) {
+				view.showWin();
+			} else {
+				view.showDraw();
+			}
 
-			view.showDraw();
 			model.reset();
 			view.update();
+			view.waitUserMove();
 
 		} else {
 
@@ -94,34 +101,24 @@ public class TicTacToeController {
 	 */
 	public void playAi() {
 
-		var bestMove = decisionAlgorithm.getBestMove();
-		model.play(bestMove);
-		updateSquareView(bestMove.square());
+		model.play(decisionAlgorithm.getBestMove());
+		view.update();
 
-		if (model.isWin()) {
+		var win = model.isWin();
+		var draw = model.isDraw();
 
-			view.showLoss();
-			model.reset();
-			view.update();
+		if (win || draw) {
 
-		} else if (model.isDraw()) {
+			if (win) {
+				view.showLoss();
+			} else {
+				view.showDraw();
+			}
 
-			view.showDraw();
 			model.reset();
 			view.update();
 		}
-	}
 
-	/**
-	 * Updates the view for the given square.
-	 *
-	 * @param square square whose view must be updated
-	 * @since 0.0.0
-	 */
-	private void updateSquareView(Square square) {
-
-		var squareIndex = square.getIndex();
-		var squareController = squares.get(squareIndex);
-		squareController.updateView();
+		waitUserMove();
 	}
 }
