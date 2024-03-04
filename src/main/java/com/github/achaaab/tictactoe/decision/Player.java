@@ -10,7 +10,7 @@ package com.github.achaaab.tictactoe.decision;
 public interface Player<M extends Move> {
 
 	/**
-	 * @return player next move
+	 * @return next move of this player
 	 * @since 0.0.0
 	 */
 	M getMove();

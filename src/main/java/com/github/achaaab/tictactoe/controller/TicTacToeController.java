@@ -110,18 +110,11 @@ public class TicTacToeController {
 			crossTurn = !crossTurn;
 		}
 
-		boolean anotherRound;
+		var anotherRound = model.isWin() ?
+				view.showWin(crossTurn ? CIRCLE : CROSS) :
+				view.showDraw();
 
-		if (model.isWin()) {
-			anotherRound = view.showWin(crossTurn ? CIRCLE : CROSS);
-		} else {
-			anotherRound = view.showDraw();
-		}
-
-		if (anotherRound) {
-			crossFirst = !crossFirst;
-		}
-
+		crossFirst = !crossFirst;
 		return anotherRound;
 	}
 

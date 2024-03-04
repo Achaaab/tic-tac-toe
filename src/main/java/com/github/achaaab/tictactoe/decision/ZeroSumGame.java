@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public interface ZeroSumGame<M extends Move> {
 
 	/**
-	 * @return legal moves
+	 * @return legal moves at the current state
 	 * @since 0.0.0
 	 */
 	Stream<M> getMoves();

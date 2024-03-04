@@ -10,6 +10,8 @@ public class AiPlayer<M extends Move> implements Player<M> {
 	private final DecisionAlgorithm<M> decisionAlgorithm;
 
 	/**
+	 * Creates a new AI player based on the given algorithm.
+	 *
 	 * @param decisionAlgorithm decision algorithm
 	 * @since 0.0.0
 	 */

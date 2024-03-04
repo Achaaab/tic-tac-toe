@@ -29,7 +29,7 @@ public class Application {
 	 *         <ul>
 	 *             <li>hh: Human vs. human</li>
 	 *             <li>cc: Computer vs. computer</li>
-	 *             <li>ch : Computer vs. human</li>
+	 *             <li>ch: Computer vs. human</li>
 	 *         </ul>
 	 *     </li>
 	 * </ol>
