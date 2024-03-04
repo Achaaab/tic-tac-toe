@@ -17,7 +17,8 @@ public class SquareTerminal implements SquareView {
 	private SquareController controller;
 
 	/**
-	 * Creates a terminal view
+	 * Creates a terminal view for a Tic-tac-toe square.
+	 *
 	 * @param ticTacToe Tic-tac-toe view
 	 * @since 0.0.0
 	 */

@@ -1,11 +1,13 @@
 package com.github.achaaab.tictactoe.controller;
 
-import com.github.achaaab.tictactoe.decision.DecisionAlgorithm;
+import com.github.achaaab.tictactoe.decision.Player;
 import com.github.achaaab.tictactoe.model.DrawSymbol;
 import com.github.achaaab.tictactoe.model.Square;
 import com.github.achaaab.tictactoe.model.TicTacToe;
 import com.github.achaaab.tictactoe.view.TicTacToeView;
 
+import static com.github.achaaab.tictactoe.model.TicTacToe.CIRCLE;
+import static com.github.achaaab.tictactoe.model.TicTacToe.CROSS;
 import static java.util.stream.IntStream.range;
 
 /**
@@ -18,24 +20,26 @@ public class TicTacToeController {
 
 	private final TicTacToe model;
 	private final TicTacToeView view;
-	private final DecisionAlgorithm<DrawSymbol> decisionAlgorithm;
+
+	private boolean crossFirst;
+	private Player<DrawSymbol> circlePlayer;
+	private Player<DrawSymbol> crossPlayer;
 
 	/**
 	 * Creates a controller for the given Tic-tac-toe game.
 	 *
 	 * @param model Tic-tac-toe game model
 	 * @param view Tic-tac-toe game view
-	 * @param decisionAlgorithm AI decision algorithm
 	 * @since 0.0.0
 	 */
-	public TicTacToeController(TicTacToe model, TicTacToeView view, DecisionAlgorithm<DrawSymbol> decisionAlgorithm) {
+	public TicTacToeController(TicTacToe model, TicTacToeView view) {
 
 		this.model = model;
 		this.view = view;
 
 		range(0, 9).forEach(this::createSquareController);
 
-		this.decisionAlgorithm = decisionAlgorithm;
+		crossFirst = true;
 	}
 
 	/**
@@ -53,12 +57,86 @@ public class TicTacToeController {
 	}
 
 	/**
-	 * Waits for the user to make his move.
+	 * Sets the player who plays the circles.
+	 *
+	 * @param circlePlayer player who plays the circles
+	 * @since 0.0.0
+	 */
+	public void setCirclePlayer(Player<DrawSymbol> circlePlayer) {
+		this.circlePlayer = circlePlayer;
+	}
+
+	/**
+	 * Sets the player who plays the crosses.
+	 *
+	 * @param crossPlayer player who plays the crosses
+	 * @since 0.0.0
+	 */
+	public void setCrossPlayer(Player<DrawSymbol> crossPlayer) {
+		this.crossPlayer = crossPlayer;
+	}
+
+	/**
+	 * Plays rounds while the user wants to continue.
 	 *
 	 * @since 0.0.0
 	 */
-	public void waitUserMove() {
-		view.waitUserMove();
+	public void play() {
+		while (playRound());
+	}
+
+	/**
+	 * Starts a new round.
+	 *
+	 * @return whether to play another round
+	 * @since 0.0.0
+	 */
+	public boolean playRound() {
+
+		model.reset();
+		model.setCurrentSymbol(crossFirst ? CROSS : CIRCLE);
+		view.update();
+
+		var crossTurn = crossFirst;
+
+		while(!model.isOver()) {
+
+			var player = crossTurn ? crossPlayer : circlePlayer;
+			var move = player.getMove();
+
+			model.play(move);
+			view.update();
+
+			crossTurn = !crossTurn;
+		}
+
+		boolean anotherRound;
+
+		if (model.isWin()) {
+			anotherRound = view.showWin(crossTurn ? CIRCLE : CROSS);
+		} else {
+			anotherRound = view.showDraw();
+		}
+
+		if (anotherRound) {
+			crossFirst = !crossFirst;
+		}
+
+		return anotherRound;
+	}
+
+	/**
+	 * Gets user move.
+	 *
+	 * @since 0.0.0
+	 */
+	public DrawSymbol getUserMove() {
+
+		var squareView = view.getPlayedSquare();
+		var squareController = squareView.getController();
+		var square = squareController.getModel();
+
+		return new DrawSymbol(square, model.getCurrentSymbol());
 	}
 
 	/**
@@ -68,57 +146,6 @@ public class TicTacToeController {
 	 * @since 0.0.0
 	 */
 	public void play(Square square) {
-
 		model.play(square);
-
-		var win = model.isWin();
-		var draw = model.isDraw();
-
-		if (win || draw) {
-
-			view.update();
-
-			if (win) {
-				view.showWin();
-			} else {
-				view.showDraw();
-			}
-
-			model.reset();
-			view.update();
-			view.waitUserMove();
-
-		} else {
-
-			playAi();
-		}
-	}
-
-	/**
-	 * Plays the AI move.
-	 *
-	 * @since 0.0.0
-	 */
-	public void playAi() {
-
-		model.play(decisionAlgorithm.getBestMove());
-		view.update();
-
-		var win = model.isWin();
-		var draw = model.isDraw();
-
-		if (win || draw) {
-
-			if (win) {
-				view.showLoss();
-			} else {
-				view.showDraw();
-			}
-
-			model.reset();
-			view.update();
-		}
-
-		waitUserMove();
 	}
 }

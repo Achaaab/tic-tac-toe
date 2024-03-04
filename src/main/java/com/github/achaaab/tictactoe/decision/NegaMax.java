@@ -1,5 +1,7 @@
 package com.github.achaaab.tictactoe.decision;
 
+import static java.lang.Math.max;
+
 /**
  * Negamax algorithm without depth limit (only for very simple games).
  *
@@ -9,6 +11,10 @@ package com.github.achaaab.tictactoe.decision;
  */
 public record NegaMax<M extends Move>(ZeroSumGame<M> game) implements DecisionAlgorithm<M> {
 
+	private static final double WIN_VALUE = 1.0;
+	private static final double DRAW_VALUE = 0.0;
+	private static final double LOSE_VALUE = -1.0;
+
 	@Override
 	public double evaluate(M move) {
 
@@ -17,18 +23,22 @@ public record NegaMax<M extends Move>(ZeroSumGame<M> game) implements DecisionAl
 
 		if (game.isWin()) {
 
-			value = 1;
+			value = WIN_VALUE;
 
 		} else if (game.isDraw()) {
 
-			value = 0;
+			value = DRAW_VALUE;
 
 		} else {
 
-			value = -game.getMoves().
-					map(this::evaluate).
-					max(Double::compareTo).
-					orElseThrow();
+			var nextValue = LOSE_VALUE;
+			var moves = game.getMoves().iterator();
+
+			while (nextValue != WIN_VALUE && moves.hasNext()) {
+				nextValue = max(nextValue, evaluate(moves.next()));
+			}
+
+			value = -nextValue;
 		}
 
 		game.cancel(move);

@@ -10,9 +10,6 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import static com.github.achaaab.tictactoe.model.TicTacToe.CIRCLE;
-import static com.github.achaaab.tictactoe.view.TicTacToeView.CIRCLE_COLOR;
-import static com.github.achaaab.tictactoe.view.TicTacToeView.CROSS_COLOR;
 import static com.github.achaaab.tictactoe.view.swing.SwingUtility.scale;
 import static com.github.achaaab.tictactoe.view.swing.SwingUtility.scaleFloat;
 import static java.awt.BorderLayout.CENTER;
@@ -27,17 +24,22 @@ import static java.util.Arrays.stream;
  */
 public class SquareSwing extends JPanel implements SquareView {
 
+	private final TicTacToeSwing ticTacToe;
+
 	private final JButton button;
 	private final JLabel label;
 
 	private SquareController controller;
+	private boolean allowed;
 
 	/**
 	 * Creates a view for a square.
 	 *
 	 * @since 0.0.0
 	 */
-	public SquareSwing() {
+	public SquareSwing(TicTacToeSwing ticTacToe) {
+
+		this.ticTacToe = ticTacToe;
 
 		button = new JButton();
 		label = new JLabel();
@@ -46,10 +48,14 @@ public class SquareSwing extends JPanel implements SquareView {
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setVerticalAlignment(SwingConstants.CENTER);
 		button.addActionListener(event -> controller.play());
-		button.setEnabled(false);
 
 		setPreferredSize(new Dimension(scale(64), scale(64)));
 		setLayout(new BorderLayout());
+
+		// Since we are hot-swapping components, repaints from the operating system can trigger various exceptions.
+		setIgnoreRepaint(true);
+
+		allowed = true;
 	}
 
 	@Override
@@ -83,21 +89,43 @@ public class SquareSwing extends JPanel implements SquareView {
 
 			var symbol = controller.getSymbol();
 			label.setText(Character.toString(symbol));
-			label.setForeground(symbol == CIRCLE ? CIRCLE_COLOR : CROSS_COLOR);
+			label.setForeground(getSymbolColor());
 
 			add(label, CENTER);
 		}
 
+		// It seems to be the best practice when adding or removing components: validate() then repaint().
 		validate();
 		repaint();
 	}
 
 	/**
-	 * Enables the player to move in this square.
+	 * Allows the user to play in this square.
 	 *
 	 * @since 0.0.0
 	 */
-	public void enableMove() {
-		button.setEnabled(true);
+	public void allow() {
+		allowed = true;
+	}
+
+	/**
+	 * Prevents the user to play in this square.
+	 *
+	 * @since 0.0.0
+	 */
+	public void disallow() {
+		allowed = false;
+	}
+
+	/**
+	 * Plays in this square, if allowed.
+	 *
+	 * @since 0.0.0
+	 */
+	private void play() {
+
+		if (allowed) {
+			ticTacToe.setPlayedSquare(this);
+		}
 	}
 }

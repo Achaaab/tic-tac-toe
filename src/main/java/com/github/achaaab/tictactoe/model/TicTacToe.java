@@ -47,8 +47,6 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 		squares = range(0, 9).
 				mapToObj(index -> new Square()).
 				toList();
-
-		currentSymbol = CROSS;
 	}
 
 	/**
@@ -136,5 +134,21 @@ public class TicTacToe implements ZeroSumGame<DrawSymbol> {
 
 		move.square().setSymbol(EMPTY);
 		currentSymbol = other(currentSymbol);
+	}
+
+	/**
+	 * @return current symbol
+	 * @since 0.0.0
+	 */
+	public char getCurrentSymbol() {
+		return currentSymbol;
+	}
+
+	/**
+	 * @param currentSymbol current symbol
+	 * @since 0.0.0
+	 */
+	public void setCurrentSymbol(char currentSymbol) {
+		this.currentSymbol = currentSymbol;
 	}
 }

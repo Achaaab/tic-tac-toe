@@ -13,7 +13,6 @@ public class SquareController {
 
 	private final TicTacToeController ticTacToe;
 	private final Square model;
-	private final SquareView view;
 
 	/**
 	 * Creates a controller for the given square.
@@ -28,9 +27,16 @@ public class SquareController {
 
 		this.ticTacToe = ticTacToe;
 		this.model = model;
-		this.view = view;
 
 		view.setController(this);
+	}
+
+	/**
+	 * @return model of this square
+	 * @since 0.0.0
+	 */
+	public Square getModel() {
+		return model;
 	}
 
 	/**
@@ -56,14 +62,5 @@ public class SquareController {
 	 */
 	public void play() {
 		ticTacToe.play(model);
-	}
-
-	/**
-	 * Updates the view for this square.
-	 *
-	 * @since 0.0.0
-	 */
-	public void updateView() {
-		view.update();
 	}
 }

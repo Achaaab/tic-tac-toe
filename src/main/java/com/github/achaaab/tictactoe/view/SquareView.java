@@ -2,6 +2,12 @@ package com.github.achaaab.tictactoe.view;
 
 import com.github.achaaab.tictactoe.controller.SquareController;
 
+import java.awt.Color;
+
+import static com.github.achaaab.tictactoe.model.TicTacToe.CIRCLE;
+import static com.github.achaaab.tictactoe.view.TicTacToeView.CIRCLE_COLOR;
+import static com.github.achaaab.tictactoe.view.TicTacToeView.CROSS_COLOR;
+
 /**
  * View for a Tic-tac-toe square.
  *
@@ -48,11 +54,14 @@ public interface SquareView {
 	}
 
 	/**
-	 * Makes the user play in this square.
+	 * Only when a symbol is played in this square.
 	 *
+	 * @return symbol color
 	 * @since 0.0.0
 	 */
-	default void play() {
-		getController().play();
+	default Color getSymbolColor() {
+
+		var symbol = getSymbol();
+		return symbol == CIRCLE ? CIRCLE_COLOR : CROSS_COLOR;
 	}
 }

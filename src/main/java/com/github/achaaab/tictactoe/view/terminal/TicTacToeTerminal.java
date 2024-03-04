@@ -4,13 +4,12 @@ import com.github.achaaab.tictactoe.view.SquareView;
 import com.github.achaaab.tictactoe.view.TicTacToeView;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import static com.github.achaaab.tictactoe.model.TicTacToe.CIRCLE;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.lang.String.format;
 import static java.util.stream.Stream.generate;
@@ -63,17 +62,26 @@ public class TicTacToeTerminal implements TicTacToeView {
 		scanner = new Scanner(System.in);
 	}
 
-	@Override
-	public void waitUserMove() {
+	/**
+	 * Asks a question and keeps prompting for answers until a valid one is provided.
+	 *
+	 * @param question question to display
+	 * @param answerSupplier answer supplier (usually based on scanner)
+	 * @param condition condition that answers must verify in order to be accepted
+	 * @return valid answer
+	 * @param <T> answer type
+	 * @since 0.0.0
+	 */
+	public <T> T ask(String question, Supplier<T> answerSupplier, Predicate<T> condition) {
 
-		int index;
+		T answer;
 		boolean validAnswer;
 
 		do {
 
-			terminal.print("Your move? (9 for exit) > ");
-			index = scanner.nextInt();
-			validAnswer = index >= 0 && index <= 8 && getSquare(index).isEmpty() || index == 9;
+			terminal.print(question + " ");
+			answer = answerSupplier.get();
+			validAnswer = condition.test(answer);
 
 			if (!validAnswer) {
 
@@ -84,9 +92,34 @@ public class TicTacToeTerminal implements TicTacToeView {
 
 		} while (!validAnswer);
 
-		if (index != 9) {
-			getSquare(index).play();
-		}
+		return answer;
+	}
+
+	@Override
+	public SquareView getPlayedSquare() {
+
+		var squareIndex = ask(
+				"Your move?",
+				this::readInteger,
+				index -> index >= 0 && index <= 8 && getSquare(index).isEmpty());
+
+		return getSquare(squareIndex);
+	}
+
+	/**
+	 * Reads an integer from the standard input and consumes the following new line delimiter.
+	 *
+	 * @return integer read from the standard input
+	 * @since 0.0.0
+	 */
+	private int readInteger() {
+
+		var integer = scanner.nextInt();
+
+		// Consumes the new line delimiter.
+		scanner.nextLine();
+
+		return integer;
 	}
 
 	/**
@@ -164,8 +197,8 @@ public class TicTacToeTerminal implements TicTacToeView {
 
 		} else {
 
-			var symbol = getSquare(index).getSymbol();
-			var color = symbol == CIRCLE ? CIRCLE_COLOR : CROSS_COLOR;
+			var symbol = square.getSymbol();
+			var color = square.getSymbolColor();
 			return getColoredText(Character.toString(symbol), color, GRID_COLOR);
 		}
 	}
@@ -188,18 +221,13 @@ public class TicTacToeTerminal implements TicTacToeView {
 	}
 
 	@Override
-	public void showWin() {
-		confirm("You won!");
+	public boolean showWin(char symbol) {
+		return confirm(symbol + " won!");
 	}
 
 	@Override
-	public void showLoss() {
-		confirm("You lost...");
-	}
-
-	@Override
-	public void showDraw() {
-		confirm("It's a draw.");
+	public boolean showDraw() {
+		return confirm("It's a draw.");
 	}
 
 	@Override
@@ -211,17 +239,16 @@ public class TicTacToeTerminal implements TicTacToeView {
 	 * Asks the user to confirm a message.
 	 *
 	 * @param message message to confirm
+	 * @return whether to play another round
 	 * @since 0.0.0
 	 */
-	private void confirm(String message) {
+	private boolean confirm(String message) {
 
-		terminal.print(message);
-		terminal.print("\nPress any key to continue...");
+		terminal.println(message);
 
-		try {
-			System.in.read();
-		} catch (IOException cause) {
-			throw new UncheckedIOException(cause);
-		}
+		return "yes".equals(ask(
+				"Continue yes / no?",
+				scanner::nextLine,
+				answer -> answer.equals("yes") || answer.equals("no")));
 	}
 }

@@ -13,9 +13,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Stream.generate;
-import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.SwingUtilities.invokeLater;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -47,6 +50,7 @@ public class TicTacToeSwing extends JPanel implements TicTacToeView {
 	}
 
 	private final List<SquareSwing> squares;
+	private SquareSwing playedSquare;
 
 	/**
 	 * Creates a view for a Tic-tac-toe game.
@@ -55,7 +59,7 @@ public class TicTacToeSwing extends JPanel implements TicTacToeView {
 	 */
 	public TicTacToeSwing() {
 
-		squares = generate(SquareSwing::new).limit(9).toList();
+		squares = generate(() -> new SquareSwing(this)).limit(9).toList();
 
 		invokeLater(() -> {
 
@@ -78,8 +82,34 @@ public class TicTacToeSwing extends JPanel implements TicTacToeView {
 	}
 
 	@Override
-	public void waitUserMove() {
-		squares.forEach(SquareSwing::enableMove);
+	public synchronized SquareView getPlayedSquare() {
+
+		squares.forEach(SquareSwing::allow);
+
+		playedSquare = null;
+
+		while (playedSquare == null) {
+
+			try {
+				wait();
+			} catch (InterruptedException interruptedException) {
+				currentThread().interrupt();
+			}
+		}
+
+		squares.forEach(SquareSwing::disallow);
+
+		return playedSquare;
+	}
+
+	/**
+	 * @param playedSquare square in which the user played
+	 * @since 0.0.0
+	 */
+	public synchronized void setPlayedSquare(SquareSwing playedSquare) {
+
+		this.playedSquare = playedSquare;
+		notify();
 	}
 
 	@Override
@@ -88,27 +118,23 @@ public class TicTacToeSwing extends JPanel implements TicTacToeView {
 	}
 
 	@Override
-	public void showWin() {
-		showMessage("You won!");
+	public boolean showWin(char symbol) {
+		return confirm(symbol + " won!");
 	}
 
 	@Override
-	public void showLoss() {
-		showMessage("You lost...");
-	}
-
-	@Override
-	public void showDraw() {
-		showMessage("It's a draw.");
+	public boolean showDraw() {
+		return confirm("It's a draw.");
 	}
 
 	/**
-	 * Displays a message and waits for the user to confirm it.
+	 * Displays the result and waits for the user decision.
 	 *
-	 * @param message message to display
+	 * @param result result to display
+	 * @return whether to play another round
 	 * @since 0.0.0
 	 */
-	private void showMessage(String message) {
-		showMessageDialog(null, message);
+	private boolean confirm(String result) {
+		return showConfirmDialog(this, result + "Continue?", "Continue?", YES_NO_OPTION) == YES_OPTION;
 	}
 }

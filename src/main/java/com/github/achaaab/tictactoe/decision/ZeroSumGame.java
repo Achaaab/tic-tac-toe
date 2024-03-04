@@ -18,6 +18,16 @@ public interface ZeroSumGame<M extends Move> {
 	Stream<M> getMoves();
 
 	/**
+	 * Generally speaking, a game is considered as ended if the last move resulted in a win or a draw.
+	 *
+	 * @return whether this game is over
+	 * @since 0.0.0
+	 */
+	default boolean isOver() {
+		return isWin() || isDraw();
+	}
+
+	/**
 	 * @return {@code true} if this game is a draw
 	 * @since 0.0.0
 	 */

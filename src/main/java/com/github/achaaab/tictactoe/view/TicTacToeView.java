@@ -26,23 +26,19 @@ public interface TicTacToeView {
 	/**
 	 * Displays a win message and waits for the user to confirm it.
 	 *
+	 * @param symbol winning symbol
+	 * @return whether to play another round
 	 * @since 0.0.0
 	 */
-	void showWin();
-
-	/**
-	 * Displays a loss message and waits for the user to confirm it.
-	 *
-	 * @since 0.0.0
-	 */
-	void showLoss();
+	boolean showWin(char symbol);
 
 	/**
 	 * Displays a draw message and waits for the user to confirm it.
 	 *
+	 * @return whether to play another round
 	 * @since 0.0.0
 	 */
-	void showDraw();
+	boolean showDraw();
 
 	/**
 	 * Gets the view for the square at specified index.
@@ -54,9 +50,10 @@ public interface TicTacToeView {
 	SquareView getSquare(int index);
 
 	/**
-	 * Waits for the user to make his move.
+	 * Gets user move.
 	 *
+	 * @return user move
 	 * @since 0.0.0
 	 */
-	void waitUserMove();
+	SquareView getPlayedSquare();
 }
